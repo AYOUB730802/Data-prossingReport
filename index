@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Infectious Skin Disease Project – Preprocessing & Setup Report</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg-alt: #141a2a;
+      --accent: #3fbfbf;
+      --accent-soft: rgba(63,191,191,0.12);
+      --text-main: #f5f7ff;
+      --text-muted: #a4acc9;
+      --border-subtle: #232a3d;
+      --danger: #ff6b81;
+      --success: #45d188;
+      --mono: "Fira Code", Menlo, Consolas, monospace;
+      --sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 32px 16px;
+      font-family: var(--sans);
+      background: radial-gradient(circle at top, #171e33 0, #050814 55%, #02030a 100%);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+    .page {
+      max-width: 980px;
+      width: 100%;
+      background: linear-gradient(145deg, rgba(16,22,40,0.98), rgba(7,10,20,0.98));
+      border-radius: 18px;
+      padding: 28px 30px 32px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.65);
+      border: 1px solid rgba(130,154,255,0.16);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      letter-spacing: 0.03em;
+      margin: 0 0 4px;
+    }
+    header p {
+      margin: 0;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .badge {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(7,12,26,0.9);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .badge.success {
+      border-color: rgba(69,209,136,0.4);
+      color: var(--success);
+    }
+    .badge.pending {
+      border-color: rgba(255,183,77,0.5);
+      color: #ffb74d;
+    }
+
+    h2 {
+      font-size: 1.05rem;
+      margin: 20px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      font-weight: 600;
+      color: #e4e8ff;
+    }
+    h2::before {
+      content: "";
+      width: 16px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+    p {
+      margin: 4px 0 10px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0,2fr) minmax(0,1.6fr);
+      gap: 16px;
+    }
+    .card {
+      background: radial-gradient(circle at top left, rgba(63,191,191,0.12), rgba(11,15,30,0.96));
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid rgba(71,91,161,0.6);
+    }
+    .card.subtle {
+      background: rgba(10,14,30,0.96);
+      border-color: var(--border-subtle);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .card-header span {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .pill {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--text-muted);
+    }
+    .pill.ok {
+      border-color: rgba(69,209,136,0.4);
+      color: var(--success);
+    }
+    .pill.warn {
+      border-color: rgba(255,183,77,0.5);
+      color: #ffb74d;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 1.1fr 1.7fr;
+      gap: 2px 8px;
+      font-size: 0.85rem;
+    }
+    .kv-label {
+      color: var(--text-muted);
+    }
+    .kv-value {
+      color: var(--text-main);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 4px 0 6px;
+      font-size: 0.83rem;
+    }
+    th, td {
+      padding: 4px 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    th {
+      text-align: left;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 0.75rem;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .code-inline {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      padding: 2px 4px;
+      border-radius: 4px;
+      background: rgba(9,12,26,0.95);
+      border: 1px solid rgba(255,255,255,0.04);
+      color: #e3e7ff;
+    }
+    pre {
+      margin: 6px 0 4px;
+      border-radius: 8px;
+      background: rgba(7,10,22,0.98);
+      border: 1px solid rgba(255,255,255,0.04);
+      padding: 8px 10px;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: #e4e7ff;
+    }
+    code {
+      font-family: var(--mono);
+    }
+
+    .label-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 2px;
+    }
+    .label {
+      font-size: 0.78rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(15,20,40,0.95);
+      color: var(--text-muted);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .label.strong {
+      border-color: rgba(63,191,191,0.5);
+      color: var(--accent);
+    }
+    footer {
+      margin-top: 18px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    @media (max-width: 760px) {
+      .page { padding: 22px 16px 24px; }
+      .grid { grid-template-columns: 1fr; }
+      header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div>
+        <h1>Preprocessing & Setup Report</h1>
+        <p>Infectious skin disease detection – project bootstrap, data preprocessing, and MLOps wiring.</p>
+        <div class="badge-row">
+          <span class="badge success">Preprocessing complete</span>
+          <span class="badge success">DataLoaders ready</span>
+          <span class="badge">Git &amp; DVC wired</span>
+          <span class="badge pending">Next: model training</span>
+        </div>
+      </div>
+      <div class="kv" style="max-width: 220px;">
+        <div class="kv-label">Classes</div><div class="kv-value">Cellulitis, Folliculitis, Impetigo, Tinea [file:40]</div>
+        <div class="kv-label">Images (final)</div><div class="kv-value">4,860 (1,215 / class) [file:40]</div>
+        <div class="kv-label">Status</div><div class="kv-value">Preprocessing &amp; tracking configured [file:40]</div>
+      </div>
+    </header>
+
+    <h2>Data preprocessing</h2>
+    <div class="grid">
+      <section class="card">
+        <div class="card-header">
+          <span>Pipeline summary</span>
+          <span class="pill ok">image_preprocessor.py</span>
+        </div>
+        <p>The pipeline loads Derm1M metadata from CSVs, removes duplicates and low-quality images, balances the four classes, and creates train/val/test splits. [file:40]</p>
+        <div class="kv">
+          <div class="kv-label">Loaded images</div><div class="kv-value">10,937 total across 4 diseases</div>
+          <div class="kv-label">After cleaning</div><div class="kv-value">9,241 unique high-quality images</div>
+          <div class="kv-label">Per class (final)</div><div class="kv-value">1,215 images (perfectly balanced via undersampling)</div>
+        </div>
+        <p>Images are resized to 224×224 RGB and normalized with mean and std of [0.5, 0.5, 0.5] to match MedImageInsight-friendly settings. [file:40]</p>
+      </section>
+
+      <section class="card subtle">
+        <div class="card-header">
+          <span>Split statistics</span>
+          <span class="pill ok">Stratified 70 / 15 / 15</span>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Split</th><th>Total</th><th>Per class</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Train</td><td>3,402</td><td>≈850 / class</td></tr>
+            <tr><td>Val</td><td>729</td><td>≈182 / class</td></tr>
+            <tr><td>Test</td><td>729</td><td>≈182 / class</td></tr>
+          </tbody>
+        </table>
+        <p>Splits are stratified by disease label, and metadata is saved under <span class="code-inline">data/processed/*_metadata.csv</span>. [file:40]</p>
+        <div class="label-row">
+          <span class="label strong">No healthy class</span>
+          <span class="label">Resolution 224×224</span>
+          <span class="label">Normalization to [-1, 1]</span>
+        </div>
+      </section>
+    </div>
+
+    <h2>Git &amp; DVC setup</h2>
+    <div class="grid">
+      <section class="card subtle">
+        <div class="card-header">
+          <span>Repository layout</span>
+          <span class="pill ok">Versioned structure</span>
+        </div>
+        <p>The project is tracked with Git for code/config and DVC for heavy data artifacts such as processed datasets and reports. [file:40]</p>
+        <table>
+          <thead>
+            <tr><th>Path</th><th>Role</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="code-inline">data/raw/</span></td><td>Clean, organized Derm1M images (source)</td></tr>
+            <tr><td><span class="code-inline">data/processed/</span></td><td>Final train/val/test images &amp; metadata (DVC-tracked)</td></tr>
+            <tr><td><span class="code-inline">reports/</span></td><td>Quality &amp; preprocessing artifacts (DVC-tracked)</td></tr>
+            <tr><td><span class="code-inline">src/preprocessing/</span></td><td>Preprocessing logic &amp; DataLoaders</td></tr>
+          </tbody>
+        </table>
+        <p>Large CSVs are ignored by Git and kept locally or via DVC, avoiding GitHub size limits while preserving reproducibility. [file:40]</p>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <span>DVC workflow</span>
+          <span class="pill ok">Data as first-class</span>
+        </div>
+        <p>DVC is initialized with <span class="code-inline">dvc_setup.py</span>, and the processed dataset is versioned through <span class="code-inline">data/processed.dvc</span> and <span class="code-inline">reports.dvc</span>. [file:40]</p>
+        <pre><code># Example data versioning
+dvc add data/processed
+dvc push
+git add data/processed.dvc .gitignore
+git commit -m "Update processed data"
+git push</code></pre>
+        <p>On a new machine, collaborators run <span class="code-inline">git clone</span> followed by <span class="code-inline">dvc pull</span> to obtain the same processed data snapshot. [file:40]</p>
+      </section>
+    </div>
+
+    <h2>DagsHub &amp; MLflow tracking</h2>
+    <div class="grid">
+      <section class="card">
+        <div class="card-header">
+          <span>Experiment logging</span>
+          <span class="pill ok">MLflow on DagsHub</span>
+        </div>
+        <p>The preprocessing run is tracked as an MLflow experiment on the DagsHub repository <span class="code-inline">awob501/my-first-repo</span>. [file:40]</p>
+        <p>The run logs pipeline configuration, dataset sizes, and split statistics, giving a full audit trail for how the final training data was produced. [file:40]</p>
+        <div class="label-row">
+          <span class="label strong">Remote experiment UI</span>
+          <span class="label">Run: preprocessing_pipeline</span>
+        </div>
+      </section>
+
+      <section class="card subtle">
+        <div class="card-header">
+          <span>Reproducible config</span>
+          <span class="pill ok">YAML-driven</span>
+        </div>
+        <p>The file <span class="code-inline">configs/preprocessing_config.yaml</span> controls image size, normalization, random seeds, and split ratios. [file:40]</p>
+        <p>Re-running <span class="code-inline">image_preprocessor.py</span> with a modified config creates a new MLflow run and new DVC-tracked data snapshot, preserving previous versions. [file:40]</p>
+      </section>
+    </div>
+
+    <footer>
+      <span>Prepared for project documentation – preprocessing phase.</span>
+      <span>State: code, data splits, and tracking ready for model training. [file:40]</span>
+    </footer>
+  </div>
+</body>
+</html>
